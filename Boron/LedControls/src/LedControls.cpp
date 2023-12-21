@@ -27,6 +27,7 @@ bool nameRequested = false;
 // -----------------------------------
 
 int ledToggle(String command);
+int publish(String command);
 
 int led1 = D7;
 
@@ -59,7 +60,8 @@ void setup()
     Particle.subscribe("particle/device/name", subscriptionHandler);
 
     // We are also going to declare a Particle.function so that we can turn the LED on and off from the cloud.
-    Particle.function("led", ledToggle);
+    Particle.function("Led", ledToggle);
+    Particle.function("Publish", publish);
     // This is saying that when we ask the cloud for the function "led", it will employ the function ledToggle() from this app.
 
     // For good measure, let's also make sure both LEDs are off when we start:
@@ -68,7 +70,7 @@ void setup()
     publishTimer = millis();
     ledToggleTimer = publishTimer;
 
-    publishLed = new PublishLed(D6);
+    publishLed = new PublishLed(D5);
 }
 
 // Last time, we wanted to continously blink the LED on and off
@@ -95,6 +97,7 @@ void loop()
         ledToggleFlag ^= (uint8_t)0x01;
 
         ledToggleTimer = currentMillis;
+        Log.info("Publish timer %ld millis %ld", publishTimer, currentMillis);
     }
 
     if (millis() - publishTimer > PUBLISH_PERIOD_MILLIS)
@@ -119,6 +122,15 @@ void loop()
     publishLed->process();
 }
 
+int publish(String command) {
+    publishTimer = 0;
+
+    Log.info("Received publish command=%s", command.c_str());
+
+    Log.info("Set publish timer to %ld", publishTimer);
+
+    return 0;
+}
 
 // We're going to have a super cool function now that gets called when a matching API request is sent
 // This is the ledToggle function we registered to the "led" Particle.function earlier.

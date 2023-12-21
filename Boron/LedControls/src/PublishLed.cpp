@@ -1,5 +1,4 @@
 #include "PublishLed.h"
-#include "Particle.h"
 
 #define LED_CYCLE_TIME 2000
 
@@ -21,7 +20,7 @@ void PublishLed::enable() {
     this->timer = millis();
     
     // Turn on the LED
-    digitalWrite(this->gpioPin, LOW);
+    digitalWrite(this->gpioPin, HIGH);
 }
 
 /**
@@ -31,7 +30,7 @@ void PublishLed::disable() {
     this->enableFlag = false;
 
     // Turn off the LED
-    digitalWrite(this->gpioPin, HIGH);
+    digitalWrite(this->gpioPin, LOW);
 }
 
 /**

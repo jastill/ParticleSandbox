@@ -1,9 +1,11 @@
 #ifndef PublishLed_H
 #define PublishLed_H
 
+#include "Particle.h"
+
 class PublishLed {
 
-#define DEFAULT_PIN 6
+#define DEFAULT_PIN D5
 
 private:
     bool enableFlag = false;

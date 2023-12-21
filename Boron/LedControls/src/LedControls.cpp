@@ -8,6 +8,7 @@
 
 // Include Particle Device OS APIs
 #include "Particle.h"
+#include "PublishLed.h"
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -25,16 +26,14 @@ bool nameRequested = false;
 // Controlling LEDs over the Internet
 // -----------------------------------
 
-// First, let's create our "shorthand" for the pins
-// Same as in the Blink an LED example:
-// led1 is D0, led2 is D7
 int ledToggle(String command);
 
 int led1 = D7;
-int led2 = D6;
 
 long publishTimer = 0;
 #define PUBLISH_PERIOD_MILLIS (60000*60)
+
+PublishLed *publishLed;
 
 long ledToggleTimer = 0;
 #define LED_TOGGLE_PERIOD_MILLIS 10000
@@ -56,7 +55,6 @@ void setup()
 {
     // Here's the pin configuration, same as last time
     pinMode(led1, OUTPUT);
-    pinMode(led2, OUTPUT);
 
     Particle.subscribe("particle/device/name", subscriptionHandler);
 
@@ -66,10 +64,11 @@ void setup()
 
     // For good measure, let's also make sure both LEDs are off when we start:
     digitalWrite(led1, LOW);
-    digitalWrite(led2, LOW);
 
     publishTimer = millis();
     ledToggleTimer = publishTimer;
+
+    publishLed = new PublishLed(D6);
 }
 
 // Last time, we wanted to continously blink the LED on and off
@@ -113,8 +112,13 @@ void loop()
             Particle.publish("Unable to get device name!");
         }
         publishTimer = millis();
+    
+        publishLed->enable();
     }
+
+    publishLed->process();
 }
+
 
 // We're going to have a super cool function now that gets called when a matching API request is sent
 // This is the ledToggle function we registered to the "led" Particle.function earlier.
@@ -130,12 +134,12 @@ int ledToggle(String command)
 
     if (command == "off")
     {
-        digitalWrite(led2, HIGH);
+        digitalWrite(led1, HIGH);
         return 1;
     }
     else if (command == "on")
     {
-        digitalWrite(led2, LOW);
+        digitalWrite(led1, LOW);
         return 0;
     }
     else
